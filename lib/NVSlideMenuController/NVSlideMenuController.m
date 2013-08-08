@@ -21,9 +21,6 @@
 
 @interface NVSlideMenuController ()
 
-@property (nonatomic, readwrite, strong) UIViewController *menuViewController;
-@property (nonatomic, readwrite, strong) UIViewController *contentViewController;
-
 - (void)setShadowOnContentView;
 - (void)removeShadowOnContentView;
 - (CGSize)shadowOffsetAccordingToCurrentSlideDirection;
@@ -40,7 +37,6 @@
 
 @property (nonatomic, assign) CGRect contentViewControllerFrame;
 @property (nonatomic, assign) BOOL menuWasOpenAtPanBegin;
-@property (nonatomic, strong) UIPanGestureRecognizer *panGesture;
 - (void)panGestureTriggered:(UIPanGestureRecognizer *)panGesture;
 
 /** Utils */
@@ -104,6 +100,7 @@
 		self.contentViewController = nil;
 		self.panGestureEnabled = YES;
         self.slideDirection = NVSlideMenuControllerSlideFromLeftToRight;
+        self.contentViewWidthWhenMenuIsOpen = 44.f;
         self.autoAdjustMenuWidth = YES;
 	}
 	
@@ -623,6 +620,38 @@
 - (BOOL)panGestureEnabled
 {
 	return self.panGesture.enabled;
+}
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)recognizer {
+    if ([recognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        UIPanGestureRecognizer *panRecognizer = (UIPanGestureRecognizer *)recognizer;
+        CGPoint velocity = [panRecognizer velocityInView:recognizer.view];
+        
+        // if the menu is not shown only allow the panning to reveal the menu
+        // if the menu is shown, only allow the direction to hide the menu
+
+        // ABS(velocity.x) > ABS(velocity.y); // Horizontal panning
+        // ABS(velocity.x) < ABS(velocity.y); // Vertical panning
+        
+        BOOL isHorizontal = ABS(velocity.x) > ABS(velocity.y);
+        BOOL isPanningLeft = (velocity.x < 0);
+        
+        if ([self isMenuOpen]) {
+            if (self.slideDirection == NVSlideMenuControllerSlideFromLeftToRight) {
+                return isHorizontal && isPanningLeft;
+            } else {
+                return isHorizontal && !isPanningLeft;
+            }
+        } else {
+            if (self.slideDirection == NVSlideMenuControllerSlideFromLeftToRight) {
+                return isHorizontal && !isPanningLeft;
+            } else {
+                return isHorizontal && isPanningLeft;
+            }
+        }
+        
+    } else {
+        return YES;
+    }
 }
 
 

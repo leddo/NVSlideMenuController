@@ -15,15 +15,16 @@ typedef NS_ENUM(NSUInteger, NVSlideMenuControllerSlideDirection)
 };
 
 
-@interface NVSlideMenuController : UIViewController
+@interface NVSlideMenuController : UIViewController <UIGestureRecognizerDelegate>
 
-@property (nonatomic, readonly, strong) UIViewController *menuViewController;
-@property (nonatomic, readonly, strong) UIViewController *contentViewController;
+@property (nonatomic, strong) UIViewController *menuViewController;
+@property (nonatomic, strong) UIViewController *contentViewController;
 @property (nonatomic, assign) BOOL panGestureEnabled; // default is YES. Set it to NO to disable the pan gesture
 @property (nonatomic, assign) CGFloat contentViewWidthWhenMenuIsOpen; // default is 44.0
 @property (nonatomic, assign) BOOL autoAdjustMenuWidth; // default is YES. Set it to NO to keep the menu the same width as the SlideMenuController's view
 @property (nonatomic, assign) BOOL bounceWhenNavigating; // default is NO. Determines whether the contentViewController will bounce offscreen when calling
 														 // `-closeMenuBehindContentViewController:animated:completion:`
+@property (nonatomic, strong) UIPanGestureRecognizer *panGesture;
 
 - (id)initWithMenuViewController:(UIViewController *)menuViewController andContentViewController:(UIViewController *)contentViewController;
 
